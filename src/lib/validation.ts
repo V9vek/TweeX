@@ -18,3 +18,7 @@ export const loginSchema = z.object({
 
 export type SignupValues = z.infer<typeof signupSchema>;
 export type LoginValues = z.infer<typeof loginSchema>;
+
+export const createPostSchema = z.object({
+  content: requiredString,
+});
