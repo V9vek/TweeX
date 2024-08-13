@@ -8,9 +8,16 @@ import UserAvatar from "@/components/UserAvatar";
 import { useSession } from "@/app/(main)/SessionProvider";
 import { Button } from "@/components/ui/button";
 import "./styles.css";
+import { useQueryClient } from "@tanstack/react-query";
+import LoadingButton from "@/components/LoadingButton";
+import { useSubmitPostMutation } from "./mutations";
 
 export default function PostEditor() {
   const { user } = useSession();
+
+  const queryClient = useQueryClient();
+
+  const mutation = useSubmitPostMutation();
 
   const editor = useEditor({
     extensions: [
@@ -29,9 +36,13 @@ export default function PostEditor() {
       blockSeparator: "\n",
     }) || "";
 
-  async function onSubmit() {
-    await submitPost(input);
-    editor?.commands.clearContent();
+  function onSubmit() {
+    // "input" is the param to the submitPost(input)
+    mutation.mutate(input, {
+      onSuccess: () => {
+        editor?.commands.clearContent();
+      },
+    });
   }
 
   return (
@@ -43,13 +54,14 @@ export default function PostEditor() {
           className="max-h-[20rem] w-full overflow-y-auto rounded-2xl bg-background px-5 py-3"
         />
         <div className="flex justify-end">
-          <Button
+          <LoadingButton
             onClick={onSubmit}
             disabled={!input.trim()}
             className="min-w-20"
+            loading={mutation.isPending}
           >
             Post
-          </Button>
+          </LoadingButton>
         </div>
       </div>
     </div>
