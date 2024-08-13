@@ -3,9 +3,8 @@
 import InfiniteScrollContainer from "@/components/InfiniteScrollContainer";
 import Post from "@/components/posts/Post";
 import PostsLoadingSkeleton from "@/components/posts/PostsLoadingSkeleton";
-import { Button } from "@/components/ui/button";
 import kyInstance from "@/lib/ky";
-import { PostData, PostsPage } from "@/lib/types";
+import { PostsPage } from "@/lib/types";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 

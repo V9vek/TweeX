@@ -52,7 +52,7 @@ export function useSubmitPostMutation() {
 
       toast({
         description: "Post created",
-        className: "bg-green-500 text-white font-semibold",
+        className: "bg-primary text-primary-foreground font-semibold",
       });
     },
     onError(error) {
