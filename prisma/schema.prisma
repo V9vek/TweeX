@@ -27,6 +27,9 @@ model User {
   sessions     Session[]
   posts        Post[]
 
+  following Follow[] @relation("Following")
+  followers Follow[] @relation("Followers")
+
   createdAt DateTime @default(now())
 
   @@map("users")
@@ -50,4 +53,24 @@ model Post {
   createdAt DateTime @default(now())
 
   @@map("posts")
+}
+
+// follower | following
+// userA    | userB
+// userC    | userA
+
+// this means: userA followed userB
+// userA => following["userB"]
+// userB => follower["userA"]
+
+// userA's USER table "following" column will contain those records where follower is "userA" in FOLLOW table
+
+model Follow {
+  followerId  String
+  follower    User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User   @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
 }
