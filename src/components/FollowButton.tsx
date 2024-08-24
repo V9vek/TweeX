@@ -21,7 +21,7 @@ export default function FollowButton({
   const queryClient = useQueryClient();
 
   const { data } = useFollowerInfo(userId, initialState);
-  console.log(data);
+  // console.log(data);
 
   const queryKey: QueryKey = ["follower-info", userId];
 
