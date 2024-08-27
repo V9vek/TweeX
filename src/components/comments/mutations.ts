@@ -6,8 +6,9 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useToast } from "../ui/use-toast";
-import { submitComment } from "./actions";
-import { CommentsPage } from "@/lib/types";
+import { deleteComment, submitComment } from "./actions";
+import { CommentData, CommentsPage } from "@/lib/types";
+import { comment } from "postcss";
 
 export function useSubmitCommentMutation(postId: string) {
   const { toast } = useToast();
@@ -58,6 +59,51 @@ export function useSubmitCommentMutation(postId: string) {
       toast({
         variant: "destructive",
         description: "Failed to submit comment. Please try again.",
+      });
+    },
+  });
+
+  return mutation;
+}
+
+// Deleting the comment
+export function useDeleteCommentMutation() {
+  const { toast } = useToast();
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: deleteComment,
+    onSuccess: async (deletedComment) => {
+      const queryKey: QueryKey = ["comments", deletedComment.postId];
+
+      await queryClient.cancelQueries({ queryKey });
+
+      queryClient.setQueryData<InfiniteData<CommentsPage, string | null>>(
+        queryKey,
+        (oldData) => {
+          if (!oldData) return;
+
+          return {
+            pageParams: oldData.pageParams,
+            pages: oldData.pages.map((page) => ({
+              previousCursor: page.previousCursor,
+              comments: page.comments.filter((c) => c.id !== deletedComment.id),
+            })),
+          };
+        }
+      );
+
+      toast({
+        description: "Comment deleted",
+        className: "bg-red-500 text-primary-foreground font-semibold",
+      });
+    },
+    onError(error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        description: "Failed to delete comment. Please try again.",
       });
     },
   });
