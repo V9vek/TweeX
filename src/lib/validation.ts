@@ -30,3 +30,7 @@ export const udpateUserProfileSchema = z.object({
 });
 
 export type UpdateUserProfileValues = z.infer<typeof udpateUserProfileSchema>;
+
+export const createCommentSchema = z.object({
+  content: requiredString,
+});

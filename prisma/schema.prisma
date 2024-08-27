@@ -35,6 +35,8 @@ model User {
 
   createdAt DateTime @default(now())
 
+  comments Comment[]
+
   @@map("users")
 }
 
@@ -56,6 +58,8 @@ model Post {
 
   likes     Like[]
   bookmarks Bookmark[]
+
+  comments Comment[]
 
   createdAt DateTime @default(now())
 
@@ -126,4 +130,17 @@ model Bookmark {
 
   @@unique([userId, postId])
   @@map("bookmarks")
+}
+
+model Comment {
+  id      String @id @default(cuid())
+  content String
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId  String
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("comments")
 }
