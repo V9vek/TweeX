@@ -101,6 +101,7 @@ export interface CommentsPage {
   previousCursor: string | null;
 }
 
+// Notification
 export const notificationDataInclude = {
   issuer: {
     select: {
@@ -123,4 +124,8 @@ export type NotificationData = Prisma.NotificationGetPayload<{
 export interface NotificationsPage {
   notifications: NotificationData[];
   nextCursor: string | null;
+}
+
+export interface NotificationCountInfo {
+  unreadCount: number;
 }
