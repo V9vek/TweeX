@@ -18,14 +18,30 @@ export async function submitComment({
 
   const { content: contentValidated } = createCommentSchema.parse({ content });
 
-  const newComment = await prisma.comment.create({
-    data: {
-      content: contentValidated,
-      userId: user.id,
-      postId: post.id,
-    },
-    include: getCommentDataInclude(user.id),
-  });
+  const [newComment, _] = await prisma.$transaction([
+    prisma.comment.create({
+      data: {
+        content: contentValidated,
+        userId: user.id,
+        postId: post.id,
+      },
+      include: getCommentDataInclude(user.id),
+    }),
+
+    // notification for comment
+    ...(post.user.id !== user.id
+      ? [
+          prisma.notification.create({
+            data: {
+              issuerId: user.id,
+              recipientId: post.user.id,
+              postId: post.id,
+              type: "COMMENT",
+            },
+          }),
+        ]
+      : []),
+  ]);
 
   return newComment;
 }
@@ -37,16 +53,32 @@ export async function deleteComment(id: string) {
 
   const comment = await prisma.comment.findUnique({
     where: { id },
+    select: {
+      userId: true,
+      post: true,
+      postId: true,
+    },
   });
 
   if (!comment) throw new Error("Comment does not exist 🤨");
 
   if (comment.userId !== user.id) throw new Error("Unauthorized");
 
-  const deletedComment = await prisma.comment.delete({
-    where: { id },
-    include: getCommentDataInclude(user.id),
-  });
+  const [deletedComment, _] = await prisma.$transaction([
+    prisma.comment.delete({
+      where: { id },
+      include: getCommentDataInclude(user.id),
+    }),
+
+    prisma.notification.deleteMany({
+      where: {
+        issuerId: user.id,
+        recipientId: comment.post.userId,
+        postId: comment.postId,
+        type: "COMMENT",
+      },
+    }),
+  ]);
 
   return deletedComment;
 }
