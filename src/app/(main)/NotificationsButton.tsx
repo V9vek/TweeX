@@ -21,7 +21,7 @@ export default function NotificationsButton({
         .get("/api/notifications/unread-count")
         .json<NotificationCountInfo>(),
     initialData: initialState,
-    refetchInterval: 60 * 1000,
+    refetchInterval: 60 * 60 * 1000,
   });
 
   return (

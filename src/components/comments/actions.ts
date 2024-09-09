@@ -73,7 +73,7 @@ export async function deleteComment(id: string) {
     prisma.notification.deleteMany({
       where: {
         issuerId: user.id,
-        recipientId: comment.post.userId,
+        recipientId: comment.post?.userId,
         postId: comment.postId,
         type: "COMMENT",
       },
