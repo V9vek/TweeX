@@ -19,10 +19,10 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | twitter",
-    default: "twitter",
+    template: "%s | TweeX",
+    default: "TweeX",
   },
-  description: "Trying to clone twitter",
+  description: "TweeX",
 };
 
 export default function RootLayout({
